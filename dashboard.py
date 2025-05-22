@@ -1,10 +1,16 @@
 import streamlit as st
 import yfinance as yf
 import pandas as pd
-from forex_python.converter import CurrencyRates
-
-# Initialize converter
-c = CurrencyRates()
+def get_stock_price(symbol):
+    url = f"https://api.twelvedata.com/price?symbol={symbol}&apikey=e41030e68a16406988ca91f9d1b7bbce"
+    response = requests.get(url)
+    data = response.json()
+    if "price" in data:
+        return float(data["price"])
+    else:
+        st.error("Error fetching stock data.")
+        st.json(data)
+        return None
 
 st.set_page_config(page_title="Stock Alert Dashboard", layout="centered")
 st.title("Stock Alert Dashboard")
