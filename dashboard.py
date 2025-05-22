@@ -3,21 +3,26 @@ import yfinance as yf
 import pandas as pd
 import requests
 
-import requests
-
+API_KEY = "baa7c13ccae94658f5ff68a9aa7f633b"  #
 def convert_currency(amount, from_currency, to_currency):
     if from_currency == to_currency:
         return amount
     try:
-        url = f"https://api.exchangerate.host/convert?from={from_currency}&to={to_currency}"
+        url = f"https://v6.exchangerate-api.com/v6/{API_KEY}/pair/{from_currency}/{to_currency}"
         response = requests.get(url)
-        response.raise_for_status()  # This will catch HTTP errors
+        response.raise_for_status()
         data = response.json()
 
-        if 'result' not in data or data['result'] is None:
-            st.error("Currency conversion failed: No result returned.")
-            st.json(data)  # Show raw response for debugging
+        if data["result"] == "success":
+            rate = data["conversion_rate"]
+            return round(amount * rate, 2)
+        else:
+            st.error("Currency API returned an error.")
+            st.json(data)  # For debugging
             return amount
+    except Exception as e:
+        st.error(f"Currency conversion failed: {e}")
+        return amount
 
         rate = data['result']
         return round(amount * rate, 2)
