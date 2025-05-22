@@ -22,6 +22,7 @@ interval = st.selectbox("Select Interval", ["1m", "5m", "15m", "1h", "1d"])
 default_currency = "NGN"
 currencies = ["NGN", "USD", "EUR", "GBP", "CAD", "JPY"]
 display_currency = st.selectbox("Select Display Currency", currencies, index=currencies.index(default_currency))
+
 # Currency conversion function
 def convert_currency(amount, from_currency, to_currency):
     try:
@@ -33,10 +34,7 @@ def convert_currency(amount, from_currency, to_currency):
         st.error("Currency conversion failed. Please check your internet connection or try again later.")
         return amount
 
-if st.button("Check Stock Price"):
-    if symbol:
-        stock = yf.Ticker(symbol)
-
+# ✅ Only one button block!
 if st.button("Check Stock Price"):
     if symbol:
         stock = yf.Ticker(symbol)
