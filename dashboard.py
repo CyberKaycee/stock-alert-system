@@ -2,7 +2,7 @@ import streamlit as st
 import yfinance as yf
 import requests
 
-API_KEY = "baa7c13ccae94658f5ff68a9aa7f633b"  #
+API_KEY = "70bec97729d462d39cd45017dfe21897"  #
 
 def convert_currency(amount, from_currency, to_currency):
     if from_currency == to_currency:
