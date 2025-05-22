@@ -16,9 +16,6 @@ def convert_currency(amount, from_currency, to_currency):
         st.error(f"Currency conversion failed: {e}")
         return amount
 
-# Initialize converter
-c = CurrencyRates()
-
 st.set_page_config(page_title="Stock Alert Dashboard", layout="centered")
 st.title("Stock Alert Dashboard")
 
