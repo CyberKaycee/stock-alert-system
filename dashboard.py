@@ -1,9 +1,8 @@
 import streamlit as st
 import yfinance as yf
-import pandas as pd
 import requests
 
-API_KEY = "baa7c13ccae94658f5ff68a9aa7f633b"  #
+API_KEY = "baa7c13ccae94658f5ff68a9aa7f633b"  # Your API key here
 
 def convert_currency(amount, from_currency, to_currency):
     if from_currency == to_currency:
@@ -30,13 +29,6 @@ def convert_currency(amount, from_currency, to_currency):
     except Exception as e:
         st.error(f"Currency conversion failed: {e}")
         return amount
-        rate = data['result']
-        return round(amount * rate, 2)
-
-    except Exception as e:
-        st.error(f"Currency conversion failed: {e}")
-        return amount
-
 
 st.set_page_config(page_title="Stock Alert Dashboard", layout="centered")
 st.title("Stock Alert Dashboard")
@@ -55,25 +47,11 @@ default_currency = "NGN"
 currencies = ["NGN", "USD", "EUR", "GBP", "CAD", "JPY"]
 display_currency = st.selectbox("Select Display Currency", currencies, index=currencies.index(default_currency))
 
-# Currency conversion function
-def convert_currency(amount, from_currency, to_currency):
-    try:
-        if from_currency == to_currency:
-            return amount
-        rate = c.get_rate(from_currency, to_currency)
-        return round(amount * rate, 2)
-    except:
-        st.error("Currency conversion failed. Please check your internet connection or try again later.")
-        return amount
-
-# ✅ Only one button block!
 if st.button("Check Stock Price"):
     if symbol:
         stock = yf.Ticker(symbol)
-
         try:
             data = stock.history(period=period, interval=interval)
-
             if not data.empty:
                 current_price_usd = data["Close"].iloc[-1]
                 converted_price = convert_currency(current_price_usd, "USD", display_currency)
@@ -92,10 +70,8 @@ if st.button("Check Stock Price"):
                     st.info("ℹ️ Price is within your set range.")
 
                 st.line_chart(data["Close"], use_container_width=True)
-
             else:
                 st.error("❌ Could not fetch stock data. Please check the symbol and try again.")
-
         except Exception as e:
             st.error(f"An error occurred: {e}")
     else:
