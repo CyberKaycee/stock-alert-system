@@ -9,7 +9,7 @@ def get_price(stock_symbol):
     except:
         return None
 
-st.title(Stock Alert Dashboard)
+st.title("Stock Alert Dashboard")
 
 # User input
 stock_symbol = st.text_input("Enter stock symbol (e.g. HONYFLOUR.LG for Honeywell):", "HONYFLOUR.LG")
