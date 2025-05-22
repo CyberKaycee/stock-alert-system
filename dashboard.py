@@ -15,13 +15,6 @@ def get_stock_price(symbol):
         st.json(data)
         return None
 
-# Currency conversion using ExchangeRate-API (optional and currently disabled)
-def convert_currency(amount, from_currency, to_currency):
-    if from_currency == to_currency:
-        return amount
-    st.warning("Currency conversion not active. Showing USD value.")
-    return amount  # Placeholder: replace with working conversion later
-
 st.set_page_config(page_title="Stock Alert Dashboard", layout="centered")
 st.title("Stock Alert Dashboard")
 
@@ -31,9 +24,7 @@ buy_limit = st.number_input("Set Buy Limit", min_value=0.0, step=0.1)
 sell_limit = st.number_input("Set Sell Limit", min_value=0.0, step=0.1)
 
 # Currencies
-default_currency = "NGN"
-currencies = ["NGN", "USD", "EUR", "GBP", "CAD", "JPY"]
-display_currency = st.selectbox("Select Display Currency", currencies, index=currencies.index(default_currency))
+default_currency = "USD"
 
 # Currency symbols
 currency_symbol = {
