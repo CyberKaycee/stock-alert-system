@@ -4,26 +4,32 @@ import pandas as pd
 import requests
 
 API_KEY = "baa7c13ccae94658f5ff68a9aa7f633b"  #
+
 def convert_currency(amount, from_currency, to_currency):
     if from_currency == to_currency:
         return amount
     try:
-        url = f"https://v6.exchangerate-api.com/v6/{API_KEY}/pair/{from_currency}/{to_currency}"
+        url = f"https://v6.exchangerate-api.com/v6/{API_KEY}/latest/{from_currency}"
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
 
         if data["result"] == "success":
-            rate = data["conversion_rate"]
-            return round(amount * rate, 2)
+            rates = data["conversion_rates"]
+            if to_currency in rates:
+                rate = rates[to_currency]
+                return round(amount * rate, 2)
+            else:
+                st.error(f"❌ Currency {to_currency} not found in rates.")
+                return amount
         else:
             st.error("Currency API returned an error.")
-            st.json(data)  # For debugging
+            st.json(data)
             return amount
+
     except Exception as e:
         st.error(f"Currency conversion failed: {e}")
         return amount
-
         rate = data['result']
         return round(amount * rate, 2)
 
