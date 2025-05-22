@@ -1,78 +1,60 @@
 import streamlit as st
-import yfinance as yf
-import pandas as pd
 import requests
 
+# Twelve Data API
+TD_API_KEY = "e41030e68a16406988ca91f9d1b7bbce"
+
 def get_stock_price(symbol):
-    url = f"https://api.twelvedata.com/price?symbol={symbol}&apikey=e41030e68a16406988ca91f9d1b7bbce"
+    url = f"https://api.twelvedata.com/price?symbol={symbol}&apikey={TD_API_KEY}"
     response = requests.get(url)
     data = response.json()
     if "price" in data:
         return float(data["price"])
     else:
-        st.error("Error fetching stock data.")
+        st.error("Error fetching stock price.")
         st.json(data)
         return None
+
+# Currency conversion using ExchangeRate-API (optional and currently disabled)
+def convert_currency(amount, from_currency, to_currency):
+    if from_currency == to_currency:
+        return amount
+    st.warning("Currency conversion not active. Showing USD value.")
+    return amount  # Placeholder: replace with working conversion later
 
 st.set_page_config(page_title="Stock Alert Dashboard", layout="centered")
 st.title("Stock Alert Dashboard")
 
 # User input
-symbol = st.text_input("Enter Stock Symbol (e.g. AAPL, HONYFLOUR.LG)")
+symbol = st.text_input("Enter Stock Symbol (e.g. AAPL, MSFT)")
 buy_limit = st.number_input("Set Buy Limit", min_value=0.0, step=0.1)
 sell_limit = st.number_input("Set Sell Limit", min_value=0.0, step=0.1)
 
-# Time range for chart
-period = st.selectbox("Select Data Period", ["1d", "5d", "1mo", "3mo", "6mo", "1y"])
-interval = st.selectbox("Select Interval", ["1m", "5m", "15m", "1h", "1d"])
-
-# Default and selectable currencies
+# Currencies
 default_currency = "NGN"
 currencies = ["NGN", "USD", "EUR", "GBP", "CAD", "JPY"]
 display_currency = st.selectbox("Select Display Currency", currencies, index=currencies.index(default_currency))
 
-# Currency conversion function
-def convert_currency(amount, from_currency, to_currency):
-    try:
-        if from_currency == to_currency:
-            return amount
-        rate = c.get_rate(from_currency, to_currency)
-        return round(amount * rate, 2)
-    except:
-        st.error("Currency conversion failed. Please check your internet connection or try again later.")
-        return amount
+# Currency symbols
+currency_symbol = {
+    "NGN": "₦", "USD": "$", "EUR": "€",
+    "GBP": "£", "JPY": "¥", "CAD": "C$"
+}.get(display_currency, "")
 
-# ✅ Only one button block!
+# Button to fetch and show stock price
 if st.button("Check Stock Price"):
     if symbol:
-        stock = yf.Ticker(symbol)
+        price_usd = get_stock_price(symbol)
+        if price_usd:
+            converted_price = convert_currency(price_usd, "USD", display_currency)
 
-        try:
-            data = stock.history(period=period, interval=interval)
+            st.subheader(f"Current Price of {symbol.upper()}: {currency_symbol}{converted_price:.2f} {display_currency}")
 
-            if not data.empty:
-                current_price_usd = data["Close"].iloc[-1]
-                converted_price = convert_currency(current_price_usd, "USD", display_currency)
-                currency_symbol = {
-                    "NGN": "₦", "USD": "$", "EUR": "€",
-                    "GBP": "£", "JPY": "¥", "CAD": "C$"
-                }.get(display_currency, "")
-
-                st.subheader(f"Current Price of {symbol}: {currency_symbol}{converted_price:.2f} {display_currency}")
-
-                if converted_price < buy_limit:
-                    st.warning("🔽 Price is below your Buy Limit. Consider buying.")
-                elif converted_price > sell_limit:
-                    st.success("🔼 Price is above your Sell Limit. You might want to sell.")
-                else:
-                    st.info("ℹ️ Price is within your set range.")
-
-                st.line_chart(data["Close"], use_container_width=True)
-
+            if converted_price < buy_limit:
+                st.warning("🔽 Price is below your Buy Limit. Consider buying.")
+            elif converted_price > sell_limit:
+                st.success("🔼 Price is above your Sell Limit. You might want to sell.")
             else:
-                st.error("❌ Could not fetch stock data. Please check the symbol and try again.")
-
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
+                st.info("ℹ️ Price is within your set range.")
     else:
         st.error("Please enter a stock symbol.")
