@@ -38,15 +38,34 @@ if st.button("Check Stock Price"):
         stock = yf.Ticker(symbol)
 
         try:
-            data = stock.history(period=period, interval=interval)
+    data = stock.history(period=period, interval=interval)
 
-            if not data.empty:
-                current_price = data["Close"].iloc[-1]
-st.subheader(f"Current Price of {symbol}: ₦{current_price:.2f}")
-current_price_usd = data["Close"].iloc[-1]
-converted_price = convert_currency(current_price_usd, "USD", display_currency)
-currency_symbol = {"NGN": "₦", "USD": "$", "EUR": "€", "GBP": "£", "JPY": "¥", "CAD": "C$"}.get(display_currency, "")
-st.subheader(f"Current Price of {symbol}: {currency_symbol}{converted_price:.2f} {display_currency}")
+    if not data.empty:
+        current_price_usd = data["Close"].iloc[-1]
+        converted_price = convert_currency(current_price_usd, "USD", display_currency)
+        currency_symbol = {
+            "NGN": "₦", "USD": "$", "EUR": "€",
+            "GBP": "£", "JPY": "¥", "CAD": "C$"
+        }.get(display_currency, "")
+        
+        st.subheader(f"Current Price of {symbol}: {currency_symbol}{converted_price:.2f} {display_currency}")
+
+        # You can keep your alert logic and chart code here too
+        if converted_price < buy_limit:
+            st.warning("🔽 Price is below your Buy Limit. Consider buying.")
+        elif converted_price > sell_limit:
+            st.success("🔼 Price is above your Sell Limit. You might want to sell.")
+        else:
+            st.info("ℹ️ Price is within your set range.")
+
+        st.line_chart(data["Close"], use_container_width=True)
+
+    else:
+        st.error("❌ Could not fetch stock data. Please check the symbol and try again.")
+
+except Exception as e:
+    st.error(f"An error occurred: {e}")
+
 
                 current_price = data["Close"].iloc[-1]
                 st.subheader(f"Current Price of {symbol}: ₦{current_price:.2f}")
