@@ -16,34 +16,23 @@ def get_stock_price(symbol):
         return None
 
 st.set_page_config(page_title="Stock Alert Dashboard", layout="centered")
-st.title("Stock Alert Dashboard")
+st.title("📈 Stock Alert Dashboard")
 
 # User input
 symbol = st.text_input("Enter Stock Symbol (e.g. AAPL, MSFT)")
-buy_limit = st.number_input("Set Buy Limit", min_value=0.0, step=0.1)
-sell_limit = st.number_input("Set Sell Limit", min_value=0.0, step=0.1)
+buy_limit = st.number_input("Set Buy Limit (USD)", min_value=0.0, step=0.1)
+sell_limit = st.number_input("Set Sell Limit (USD)", min_value=0.0, step=0.1)
 
-# Currencies
-default_currency = "USD"
-
-# Currency symbols
-currency_symbol = {
-   "USD": "$",
-
-}.get(display_currency, "")
-
-# Button to fetch and show stock price
+# Display stock price
 if st.button("Check Stock Price"):
     if symbol:
         price_usd = get_stock_price(symbol)
         if price_usd:
-            converted_price = convert_currency(price_usd, "USD", display_currency)
+            st.subheader(f"Current Price of {symbol.upper()}: ${price_usd:.2f} USD")
 
-            st.subheader(f"Current Price of {symbol.upper()}: {currency_symbol}{converted_price:.2f} {display_currency}")
-
-            if converted_price < buy_limit:
+            if price_usd < buy_limit:
                 st.warning("🔽 Price is below your Buy Limit. Consider buying.")
-            elif converted_price > sell_limit:
+            elif price_usd > sell_limit:
                 st.success("🔼 Price is above your Sell Limit. You might want to sell.")
             else:
                 st.info("ℹ️ Price is within your set range.")
