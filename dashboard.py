@@ -1,6 +1,8 @@
 import streamlit as st
 import yfinance as yf
 import pandas as pd
+import requests
+
 def get_stock_price(symbol):
     url = f"https://api.twelvedata.com/price?symbol={symbol}&apikey=e41030e68a16406988ca91f9d1b7bbce"
     response = requests.get(url)
