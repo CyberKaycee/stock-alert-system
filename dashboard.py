@@ -1,6 +1,3 @@
-import yfinance as yf
-import streamlit as st
-
 def get_price(stock_symbol):
     try:
         stock = yf.Ticker(stock_symbol)
