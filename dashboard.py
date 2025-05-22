@@ -28,8 +28,8 @@ default_currency = "USD"
 
 # Currency symbols
 currency_symbol = {
-    "NGN": "₦", "USD": "$", "EUR": "€",
-    "GBP": "£", "JPY": "¥", "CAD": "C$"
+   "USD": "$",
+
 }.get(display_currency, "")
 
 # Button to fetch and show stock price
