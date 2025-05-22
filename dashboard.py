@@ -1,7 +1,20 @@
 import streamlit as st
 import yfinance as yf
 import pandas as pd
-from forex_python.converter import CurrencyRates
+import requests
+
+def convert_currency(amount, from_currency, to_currency):
+    if from_currency == to_currency:
+        return amount
+    try:
+        url = f"https://api.exchangerate.host/convert?from={from_currency}&to={to_currency}"
+        response = requests.get(url)
+        data = response.json()
+        rate = data["result"]
+        return round(amount * rate, 2)
+    except Exception as e:
+        st.error(f"Currency conversion failed: {e}")
+        return amount
 
 # Initialize converter
 c = CurrencyRates()
