@@ -1,6 +1,10 @@
 import streamlit as st
 import yfinance as yf
 import pandas as pd
+from forex_python.converter import CurrencyRates
+
+# Initialize converter
+c = CurrencyRates()
 
 st.set_page_config(page_title="Stock Alert Dashboard", layout="centered")
 st.title("Stock Alert Dashboard")
@@ -14,6 +18,21 @@ sell_limit = st.number_input("Set Sell Limit", min_value=0.0, step=0.1)
 period = st.selectbox("Select Data Period", ["1d", "5d", "1mo", "3mo", "6mo", "1y"])
 interval = st.selectbox("Select Interval", ["1m", "5m", "15m", "1h", "1d"])
 
+# Default and selectable currencies
+default_currency = "NGN"
+currencies = ["NGN", "USD", "EUR", "GBP", "CAD", "JPY"]
+display_currency = st.selectbox("Select Display Currency", currencies, index=currencies.index(default_currency))
+# Currency conversion function
+def convert_currency(amount, from_currency, to_currency):
+    try:
+        if from_currency == to_currency:
+            return amount
+        rate = c.get_rate(from_currency, to_currency)
+        return round(amount * rate, 2)
+    except:
+        st.error("Currency conversion failed. Please check your internet connection or try again later.")
+        return amount
+
 if st.button("Check Stock Price"):
     if symbol:
         stock = yf.Ticker(symbol)
@@ -22,6 +41,13 @@ if st.button("Check Stock Price"):
             data = stock.history(period=period, interval=interval)
 
             if not data.empty:
+                current_price = data["Close"].iloc[-1]
+st.subheader(f"Current Price of {symbol}: ₦{current_price:.2f}")
+current_price_usd = data["Close"].iloc[-1]
+converted_price = convert_currency(current_price_usd, "USD", display_currency)
+currency_symbol = {"NGN": "₦", "USD": "$", "EUR": "€", "GBP": "£", "JPY": "¥", "CAD": "C$"}.get(display_currency, "")
+st.subheader(f"Current Price of {symbol}: {currency_symbol}{converted_price:.2f} {display_currency}")
+
                 current_price = data["Close"].iloc[-1]
                 st.subheader(f"Current Price of {symbol}: ₦{current_price:.2f}")
 
